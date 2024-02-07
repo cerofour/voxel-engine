@@ -13,6 +13,7 @@
 
 #include <Windows.h>
 
+#include "Types.hpp"
 #include "ShaderCreation.hpp"
 #include "TextureLoader.h"
 #include "Camera.hpp"
@@ -24,25 +25,6 @@
 
 const glm::vec4 SKYCOLOR{ 0.0f, 0.0f, 0.0f, 1.0 };
 
-// Overload the << operator for std::ostream and std::vector<float>
-std::ostream& operator<<(std::ostream& os, const std::vector<float>& vec) {
-	os << "[ ";
-
-	int i = 0;
-	int lineno = 0;
-
-	for (const auto& element : vec) {
-
-		if (i++ % 3 == 0) {
-			lineno++;
-			os << std::endl << lineno << " ";
-		}
-
-		os << element << " ";
-	}
-	os << "]";
-	return os;
-}
 
 int main(void) {
 	auto app = Application::getInstance();
@@ -50,19 +32,20 @@ int main(void) {
 	app->onInit();
 
 	std::unique_ptr<CubeLight> cl = std::make_unique<CubeLight>(glm::vec3(1.0f, -10.0f, 20.0f));
-	std::vector<std::unique_ptr<ChunkMesh2>> chunks{};
 	rendering::Renderer renderer{};
 	renderer.attatchObject(cl.get());
 
+	// dont forget to delete this
+	Array3D<ChunkMesh2*, WORLDSIZE, WORLDSIZE, WORLDSIZE> world{};
+
 	for (int x = 0; x < WORLDSIZE; x++) {
-		for (int z = 0; z < WORLDSIZE; z++) {
-			chunks.push_back(
-				std::make_unique<ChunkMesh2>(glm::vec3(x, 0.0f, z))
-			);
-			chunks.back()->setId(chunks.size() - 1);
-			chunks.back()->generateChunk();
-			chunks.back()->generateMesh();
-			renderer.attatchObject(chunks.back().get());
+		for (int y = 0; y < WORLDSIZE; y++) {
+			for (int z = 0; z < WORLDSIZE; z++) {
+				auto chunk = new ChunkMesh2(glm::vec3((float)x, (float)y, (float)z));
+				chunk->generateChunk();
+				world.at(x, y, z) = chunk;
+				renderer.attatchObject(chunk);
+			}
 		}
 	}
 
@@ -96,13 +79,18 @@ int main(void) {
 		frameCount++;
 
 		if (currentFrame - lastTime >= 1.0f) {
-			std::cout << "FPS " << (float)frameCount << std::endl;
+			std::cout << "FPS " << (float)frameCount << '\n';
 			frameCount = 0;
 			lastTime += 1.0f;
 		}
 
+		auto px = app->getCamera().getPosition().x;
+		auto py = app->getCamera().getPosition().y;
+		auto pz = app->getCamera().getPosition().z;
+
 		auto ctx = app->getContext();
 		ctx.lightSource = cl.get();
+		ctx.world = &world;
 
 		renderer.render(ctx);
 

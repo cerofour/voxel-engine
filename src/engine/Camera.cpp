@@ -15,7 +15,6 @@ FPSCamera::FPSCamera(float f,
 	pitchAngle{ p },
 	movementSpeed{ camera_defaults::speed },
 	mouseSensitivity{ camera_defaults::sensitivity },
-	zoom{ camera_defaults::zoom },
 	view{},
 	fov{f},
 	aspectRatio{ar},
@@ -63,11 +62,11 @@ void FPSCamera::handleMouseMovement(const glm::vec2& movement, bool constraintPi
 }
 
 void FPSCamera::handleMouseScroll(float yOffset) {
-	this->zoom -= (float)yOffset;
-	if (this->zoom < camera_defaults::minZoom)
-		zoom = camera_defaults::minZoom;
-	if (this->zoom > camera_defaults::maxZoom)
-		zoom = camera_defaults::maxZoom;
+	this->fov -= (float)yOffset;
+	if (this->fov <= camera_defaults::minZoom)
+		this->fov = camera_defaults::minZoom;
+	if (this->fov >= camera_defaults::maxZoom)
+		this->fov = camera_defaults::maxZoom;
 }
 
 void FPSCamera::resetCamera() {
@@ -76,7 +75,7 @@ void FPSCamera::resetCamera() {
 	this->up = camera_defaults::up;
 	this->yawAngle = camera_defaults::yaw;
 	this->pitchAngle = camera_defaults::pitch;
-	this->zoom = camera_defaults::zoom;
+	this->fov = camera_defaults::zoom;
 }
 
 void FPSCamera::update() {

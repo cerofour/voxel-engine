@@ -7,6 +7,7 @@
 
 #include "LightSource.hpp"
 #include "ChunkMesh2.hpp"
+#include "Printing.hpp"
 
 static void checkGLError(const char* functionName) {
 	GLenum error;
@@ -57,12 +58,12 @@ ChunkMesh2::ChunkMesh2(const glm::vec3& startPos)
 		.loadTexture(TEXTUREDIR "container.jpg");
 }
 
+// PUT HERE THE TERRAIN GENERATION ALGORITHM
 void ChunkMesh2::generateChunk() {
 	for (int x = 0; x < CHUNKSIZE; x++) {
-		for (int y = 0; y < CHUNKSIZE; y++) {
-			for (int z = 0; z < CHUNKSIZE; z++) {
-				this->voxels[x][y][z] = x + y + z + 1;
-				//this->voxels[x][y][z] = (int)(0.1 * glm::simplex((glm::vec3(x, y, z) + this->startPosition)) + 1.0f) ? (x + y + z) : 0;
+		for (int z = 0; z < CHUNKSIZE; z++) {
+			for (int y = 0; y < CHUNKSIZE; y++) {
+				this->voxels[x][y][z] = (int)(0.1 * glm::simplex((glm::vec3(x, y, z) + this->startPosition)) + 1.0f) ? (x + y + z) : 0;
 			}
 		}
 	}
@@ -70,10 +71,27 @@ void ChunkMesh2::generateChunk() {
 
 #define IN_RANGE(v, l, h) (v >= l && v < h)
 
-static bool isVoid(int x, int y, int z, ChunkMesh2::Voxel3DArray& voxels) {
-	if (IN_RANGE(x, 0, CHUNKSIZE) && IN_RANGE(y, 0, CHUNKSIZE) && IN_RANGE(z, 0, CHUNKSIZE)) // verify if the coordinates are inside of the chunk
-		if (voxels[x][y][z])
-			return false;
+static bool isVoid(const glm::vec3& chunkRelPos, const glm::vec3& worldPos, const rendering::RenderingContext& ctx) {
+
+	//std::cout << chunkRelPos << " " << worldPos << '\n';
+
+	auto wx = (worldPos.x / (float)CHUNKSIZE);
+	auto wy = (worldPos.y / (float)CHUNKSIZE);
+	auto wz = (worldPos.z / (float)CHUNKSIZE);
+
+	auto cx = (CHUNKSIZE * (chunkRelPos.x == -1)) + (int)chunkRelPos.x % CHUNKSIZE;
+	auto cy = (CHUNKSIZE * (chunkRelPos.y == -1)) + (int)chunkRelPos.y % CHUNKSIZE; // always transform Y to negative because of some shit with the camera.
+	auto cz = (CHUNKSIZE * (chunkRelPos.z == -1)) + (int)chunkRelPos.z % CHUNKSIZE;
+
+	// coordinates are outside of the world, thus chunk doesn't exists (void)
+	if (wy < 0 || wy >= WORLDSIZE || wx < 0 || wx >= WORLDSIZE || wz < 0 || wz >= WORLDSIZE)
+		return true;
+
+	auto chunk = ctx.world->at(wx, wy, wz);
+	//if (IN_RANGE(cx, 0, CHUNKSIZE) && IN_RANGE(cy, 0, CHUNKSIZE) && IN_RANGE(cz, 0, CHUNKSIZE))
+	if (chunk->getVoxels()[cx][cy][cz])
+		return false;
+	
 	return true;
 }
 
@@ -113,7 +131,11 @@ static void pushVoxelId(std::vector<float>& vs, float x) {
 	vs.push_back(x);
 }
 
-void ChunkMesh2::generateMesh() {
+void ChunkMesh2::generateMesh(const rendering::RenderingContext& ctx) {
+
+	if (!this->meshUpdate)
+		return;
+
 	std::vector<float> meshPositionData;
 	std::vector<float> normals;
 	std::vector<float> textureCoords;
@@ -133,7 +155,7 @@ void ChunkMesh2::generateMesh() {
 					continue;
 
 				// top face
-				if (isVoid(a, b + 1, c, this->voxels)) {
+				if (isVoid(glm::vec3(a, b + 1, c), glm::vec3(x, y + 1, z), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x, y + 1, z);
@@ -154,7 +176,7 @@ void ChunkMesh2::generateMesh() {
 				}
 
 				// bottom face
-				if (isVoid(a, b - 1, c, this->voxels)) {
+				if (isVoid(glm::vec3(a, b - 1, c), glm::vec3(x, y - 1, z), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x, y, z);
@@ -175,7 +197,7 @@ void ChunkMesh2::generateMesh() {
 				}
 
 				// left face
-				if (isVoid(a - 1, b, c, this->voxels)) {
+				if (isVoid(glm::vec3(a - 1, b, c), glm::vec3(x - 1, y, z), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x, y, z);
@@ -196,7 +218,7 @@ void ChunkMesh2::generateMesh() {
 				}
 
 				// right face
-				if (isVoid(a + 1, b, c, this->voxels)) {
+				if (isVoid(glm::vec3(a + 1, b, c), glm::vec3(x + 1, y, z), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x + 1, y, z);
@@ -217,7 +239,7 @@ void ChunkMesh2::generateMesh() {
 				}
 
 				// front face
-				if (isVoid(a, b, c - 1, this->voxels)) {
+				if (isVoid(glm::vec3(a, b, c - 1), glm::vec3(x, y, z - 1), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x, y + 1, z);
@@ -238,7 +260,7 @@ void ChunkMesh2::generateMesh() {
 				}
 
 				// back face
-				if (isVoid(a, b, c + 1, this->voxels)) {
+				if (isVoid(glm::vec3(a, b, c + 1), glm::vec3(x, y, z + 1), ctx)) {
 					pushVoxelId(voxelIds, voxel);
 
 					pushVertex(meshPositionData, x, y, z + 1);
@@ -268,9 +290,13 @@ void ChunkMesh2::generateMesh() {
 		.addVertexAttribute(voxelIds, 1, 2, GL_FALSE);
 
 	this->vao.verticesN = meshPositionData.size() / 3;
+	this->meshUpdate = false;
 }
 
 void ChunkMesh2::render(const rendering::RenderingContext& ctx) {
+
+	this->generateMesh(ctx);
+
 	this->shaderProgram.use();
 	this->textureLoader.enableTextures();
 

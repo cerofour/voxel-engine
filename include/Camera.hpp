@@ -11,7 +11,7 @@ namespace camera_defaults {
 	const float pitch{ 0.0f };
 	const float speed{ 10.0f };
 	const float sensitivity{ 0.05f };
-	const float zoom{ 45.0f };
+	const float zoom{ 90.0f };
 	const float minZoom{ 1.0f };
 	const float maxZoom{ 60.0f };
 }
@@ -56,6 +56,7 @@ public:
 	}
 
 	const auto& getProjectionMatrix() {
+		this->projection = glm::perspective(this->fov, this->aspectRatio, 0.10f, 100.0f);
 		return this->projection;
 	}
 
@@ -79,6 +80,10 @@ public:
 		this->movementSpeed += offset;
 	}
 
+	auto updateAspectRatio(float aspectRatio) {
+		this->aspectRatio = aspectRatio;
+	}
+
 private:
 	void update();
 
@@ -94,7 +99,6 @@ private:
 
 	float movementSpeed;
 	float mouseSensitivity;
-	float zoom;
 
 	float fov;
 	float aspectRatio;

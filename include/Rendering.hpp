@@ -5,10 +5,13 @@
 
 #include <glad/glad.h>
 
+#include "Config.hpp"
+#include "Types.hpp"
 #include "ShaderCreation.hpp"
 #include "Camera.hpp"
 
 class LightSource;
+class ChunkMesh2;
 
 namespace rendering {
 	struct RenderingContext {
@@ -16,7 +19,7 @@ namespace rendering {
 		float deltaTime;
 		float lastTime;
 		LightSource* lightSource;
-		//std::vector<std::unique_ptr<ChunkMesh2>> world;
+		Array3D<ChunkMesh2*, WORLDSIZE, WORLDSIZE, WORLDSIZE>* world;
 	};
 
 	// @class RenderObject
@@ -58,6 +61,10 @@ namespace rendering {
 		MultipleBufferVAO& use() {
 			glBindVertexArray(this->vao);
 			return *this;
+		}
+
+		void clear() {
+			glDeleteBuffers(vbos.size(), this->vbos.data());
 		}
 
 		// @brief Copies the data of a vertex attribute into the VBO,

@@ -50,8 +50,9 @@ add_subdirectory(thirdparty/glm)				#math
 # Define MY_SOURCES to be a list of all the source files for my game 
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/engine/*.cpp")
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/game/*.cpp")
+file(GLOB_RECURSE HELPERS_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/helpers/*.cpp")
 
-list(APPEND MY_SOURCES ${ENGINE_SOURCES} ${GAME_SOURCES})
+list(APPEND MY_SOURCES ${ENGINE_SOURCES} ${GAME_SOURCES} ${HELPERS_SOURCES})
 
 add_executable("${CMAKE_PROJECT_NAME}")
 

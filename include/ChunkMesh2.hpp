@@ -32,7 +32,7 @@ public:
 	void generateChunk();
 
 	// @brief Naive oclusion culling algorithm
-	void generateMesh();
+	void generateMesh(const rendering::RenderingContext& ctx);
 
 	void render(const rendering::RenderingContext& ctx);
 
@@ -43,6 +43,10 @@ public:
 
 	dlb::ShaderProgram& getSP() {
 		return this->shaderProgram;
+	}
+
+	Voxel3DArray& getVoxels() {
+		return this->voxels;
 	}
 
 	void setId(int v) {
@@ -69,4 +73,6 @@ private:
 	dlb::TextureLoader textureLoader;
 
 	rendering::MultipleBufferVAO vao;
+
+	bool meshUpdate = true;
 };

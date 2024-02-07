@@ -6,9 +6,11 @@
 
 static void frameBufferSizeCallback(GLFWwindow* _, int w, int h) {
 	glViewport(0, 0, w, h);
+	// update camera projection matrix
+	Application::getInstance()->getCamera().updateAspectRatio((float)w / (float)h);
 }
 
-void mouseCallback(GLFWwindow* win, double xPosIn, double yPosIn) {
+static void mouseCallback(GLFWwindow* win, double xPosIn, double yPosIn) {
 	float xpos = static_cast<float>(xPosIn);
 	float ypos = static_cast<float>(yPosIn);
 
@@ -27,7 +29,7 @@ void mouseCallback(GLFWwindow* win, double xPosIn, double yPosIn) {
 	Application::getInstance()->getCamera().handleMouseMovement(glm::vec2(xoffset, yoffset));
 }
 
-void scrollCallback(GLFWwindow* _, double __, double yoffset) {
+static void scrollCallback(GLFWwindow* _, double __, double yoffset) {
 	Application::getInstance()->getCamera().handleMouseScroll(yoffset);
 }
 
