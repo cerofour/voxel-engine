@@ -146,4 +146,11 @@ void Application::processInput() {
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 		this->moveLight = !this->moveLight;
+
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 }

@@ -123,7 +123,7 @@ void CubeLight::render(const rendering::RenderingContext& ctx) {
 		this->position.z * (int)(!this->move) + (CHUNKSIZE * WORLDSIZE * glm::sin(glfwGetTime())) * (int)this->move);
 
 	model = glm::translate(model, this->position);
-	model = glm::scale(model, glm::vec3(.4f));
+	model = glm::scale(model, glm::vec3(4.0f));
 
 	this->shaderProgram.use();
 	this->textureLoader.enableTextures();

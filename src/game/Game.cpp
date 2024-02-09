@@ -31,7 +31,7 @@ int main(void) {
 
 	app->onInit();
 
-	std::unique_ptr<CubeLight> cl = std::make_unique<CubeLight>(glm::vec3(1.0f, -10.0f, 20.0f));
+	std::unique_ptr<CubeLight> cl = std::make_unique<CubeLight>(glm::vec3(1.0f, 80.0f, 64.0f));
 	rendering::Renderer renderer{};
 	renderer.attatchObject(cl.get());
 
@@ -49,7 +49,6 @@ int main(void) {
 		}
 	}
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	float lastTime = glfwGetTime();
 	unsigned int frameCount = 0;

@@ -10,7 +10,6 @@ out vec4 FragColor; // output a color to the fragment shader
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
 uniform vec3 viewPos;
-uniform sampler2D texture0;
 
 void main()
 {

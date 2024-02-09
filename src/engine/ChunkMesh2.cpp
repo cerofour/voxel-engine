@@ -45,7 +45,6 @@ ChunkMesh2::ChunkMesh2(const glm::vec3& startPos)
 	id{} {
 
 	this->startPosition = startPos;
-	this->startPosition.y = 0;
 
 	dlb::ShaderProgramBuilder shaderProgramBuilder{};
 	this->shaderProgram = std::move(
@@ -58,12 +57,30 @@ ChunkMesh2::ChunkMesh2(const glm::vec3& startPos)
 		.loadTexture(TEXTUREDIR "container.jpg");
 }
 
+static constexpr const int caveY = 36;
+
+static int generateTerrain(const glm::vec3& worldPos) {
+
+	if (worldPos.y <= caveY) {
+		auto noiseVal = glm::perlin(glm::vec3(worldPos.x, worldPos.y, worldPos.z) * 0.05f);
+		return noiseVal < 0 ? 0 : worldPos.y + worldPos.z;
+	}
+	
+	auto surfaceY = 40 + glm::perlin(glm::vec2(worldPos.x, worldPos.z) * 0.05f) * 8;
+	return (worldPos.y < surfaceY) ? worldPos.y + worldPos.z : 0;
+}
+
 // PUT HERE THE TERRAIN GENERATION ALGORITHM
 void ChunkMesh2::generateChunk() {
+
+	auto cx = this->startPosition.x * CHUNKSIZE;
+	auto cy = this->startPosition.y * CHUNKSIZE;
+	auto cz = this->startPosition.z * CHUNKSIZE;
+
 	for (int x = 0; x < CHUNKSIZE; x++) {
 		for (int z = 0; z < CHUNKSIZE; z++) {
 			for (int y = 0; y < CHUNKSIZE; y++) {
-				this->voxels[x][y][z] = (int)(0.1 * glm::simplex((glm::vec3(x, y, z) + this->startPosition)) + 1.0f) ? (x + y + z) : 0;
+				this->voxels[x][y][z] = generateTerrain(glm::vec3(cx + x, cy + y, cz + z));
 			}
 		}
 	}
@@ -141,6 +158,7 @@ void ChunkMesh2::generateMesh(const rendering::RenderingContext& ctx) {
 	std::vector<float> textureCoords;
 	std::vector<float> voxelIds;
 
+	
 	for (int a = 0; a < CHUNKSIZE; a++) {
 		for (int b = 0; b < CHUNKSIZE; b++) {
 			for (int c = 0; c < CHUNKSIZE; c++) {
