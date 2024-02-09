@@ -23,7 +23,7 @@
 
 #include "Application.hpp"
 
-const glm::vec4 SKYCOLOR{ 0.0f, 0.0f, 0.0f, 1.0 };
+const glm::vec4 SKYCOLOR{ 0.21, 0.78, 0.95, 1.0 };
 
 
 int main(void) {

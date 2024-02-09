@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace camera_defaults {
-	const glm::vec3 position{ 0.0f, 0.0f, -3.0f };
+	const glm::vec3 position{ 0.0f, 0.0f, 0.0f };
 	const glm::vec3 front{ 0.0f, 0.0f, -1.0f };
 	const glm::vec3 up{ 0.0f, 1.0f, 0.0f };
 	const float yaw{ 90.0f };

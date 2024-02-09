@@ -20,8 +20,8 @@ static void mouseCallback(GLFWwindow* win, double xPosIn, double yPosIn) {
 		Application::getInstance()->getFirstMouseFocus() = false;
 	}
 
-	auto xoffset = Application::getInstance()->getLastMouseX() - xpos;
-	auto yoffset = ypos - Application::getInstance()->getLastMouseY();
+	auto xoffset = xpos - Application::getInstance()->getLastMouseX();
+	auto yoffset = Application::getInstance()->getLastMouseY() - ypos;
 
 	Application::getInstance()->getLastMouseX() = xpos;
 	Application::getInstance()->getLastMouseY() = ypos;
@@ -136,10 +136,10 @@ void Application::processInput() {
 	// To move sideways first we calculate the cross product between the UP and the FRONT vector, that
 	// gives us the vector to move along the sides.
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		this->camera.moveCamera(FPSCamera::Directions::Right, this->deltaTime);
+		this->camera.moveCamera(FPSCamera::Directions::Left, this->deltaTime);
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		this->camera.moveCamera(FPSCamera::Directions::Left, this->deltaTime);
+		this->camera.moveCamera(FPSCamera::Directions::Right, this->deltaTime);
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 		this->camera.resetCamera();

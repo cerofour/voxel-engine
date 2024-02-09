@@ -18,7 +18,7 @@ FPSCamera::FPSCamera(float f,
 	view{},
 	fov{f},
 	aspectRatio{ar},
-	projection{ glm::perspective(glm::radians(f), ar, 0.10f, 100.0f) } {
+	projection{ glm::perspective(glm::radians(f), ar, -0.10f, -100.0f) } {
 
 	this->update();
 
@@ -87,7 +87,7 @@ void FPSCamera::update() {
 	);
 
 	this->right = glm::normalize(glm::cross(this->front, this->worldUp));
-	this->up = glm::normalize(glm::cross(this->front, this->right));
+	this->up = glm::normalize(glm::cross(this->right, this->front));
 
 	// update view matrix
 	this->view = glm::lookAt(
