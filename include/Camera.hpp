@@ -64,7 +64,11 @@ public:
 		return this->position;
 	}
 
-	const auto& getPVMatrix() {
+	void setPosition(const glm::vec3& pos) {
+		this->position = pos;
+	}
+
+	const auto& getPVMatrix() const {
 		return this->projection * this->view;
 	}
 

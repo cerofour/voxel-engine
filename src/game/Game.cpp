@@ -20,7 +20,7 @@
 #include "ChunkMesh2.hpp"
 #include "Rendering.hpp"
 #include "LightSource.hpp"
-
+#include "Frustum.hpp"
 #include "Application.hpp"
 
 const glm::vec4 SKYCOLOR{ 0.21, 0.78, 0.95, 1.0 };
@@ -30,6 +30,9 @@ int main(void) {
 	auto app = Application::getInstance();
 
 	app->onInit();
+
+	FPSCamera dummyCamera{ 45.0f, 800.0 / 600.0 };
+	Frustum frustum(app->getCamera());
 
 	std::unique_ptr<CubeLight> cl = std::make_unique<CubeLight>(glm::vec3(1.0f, 80.0f, 64.0f));
 	rendering::Renderer renderer{};
@@ -87,9 +90,12 @@ int main(void) {
 		auto py = app->getCamera().getPosition().y;
 		auto pz = app->getCamera().getPosition().z;
 
+		frustum.update(app->getCamera());
+
 		auto ctx = app->getContext();
 		ctx.lightSource = cl.get();
 		ctx.world = &world;
+		ctx.frustum = &frustum;
 
 		renderer.render(ctx);
 

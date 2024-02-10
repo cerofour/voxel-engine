@@ -38,6 +38,7 @@ public:
 	void preRender();
 	void setLightingUniforms(const rendering::RenderingContext& ctx) override;
 	void render(const rendering::RenderingContext& ctx);
+	bool inFrustum(const rendering::RenderingContext& ctx) { return true; };
 
 public:
 	void dontMove() {

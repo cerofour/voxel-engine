@@ -8,6 +8,7 @@
 #include "LightSource.hpp"
 #include "ChunkMesh2.hpp"
 #include "Printing.hpp"
+#include "Frustum.hpp"
 
 static void checkGLError(const char* functionName) {
 	GLenum error;
@@ -333,4 +334,25 @@ void ChunkMesh2::render(const rendering::RenderingContext& ctx) {
 	checkGLError(__FUNCTION__);
 
 	this->vao.draw();
+}
+
+bool ChunkMesh2::inFrustum(const rendering::RenderingContext& ctx) {
+	auto& pos = this->startPosition;
+
+	// calculate all 8 vertices of the chunk
+
+	auto scale = (float)CHUNKSIZE;
+
+	std::array<glm::vec3, 8> vertices = {
+		pos * scale, // (pos + glm::vec3(0.0f, 0.0f, 0.0f)
+		(pos + glm::vec3(1.0f, 0.0f, 0.0f)) * scale,
+		(pos + glm::vec3(0.0f, 1.0f, 0.0f)) * scale,
+		(pos + glm::vec3(0.0f, 0.0f, 1.0f)) * scale,
+		(pos + glm::vec3(1.0f, 1.0f, 0.0f)) * scale,
+		(pos + glm::vec3(1.0f, 0.0f, 1.0f)) * scale,
+		(pos + glm::vec3(0.0f, 1.0f, 1.0f)) * scale,
+		(pos + glm::vec3(1.0f, 1.0f, 1.0f)) * scale,
+	};
+	
+	return ctx.frustum->boxIn(vertices);
 }

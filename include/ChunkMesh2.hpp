@@ -36,6 +36,8 @@ public:
 
 	void render(const rendering::RenderingContext& ctx);
 
+	bool inFrustum(const rendering::RenderingContext& ctx);
+
 public:
 	rendering::MultipleBufferVAO& getVAO() {
 		return this->vao;
@@ -51,6 +53,10 @@ public:
 
 	void setId(int v) {
 		this->id = v;
+	}
+
+	const glm::vec3& getStartPosition() const {
+		return startPosition;
 	}
 
 private:

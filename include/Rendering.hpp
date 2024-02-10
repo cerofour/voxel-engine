@@ -10,6 +10,7 @@
 #include "ShaderCreation.hpp"
 #include "Camera.hpp"
 
+class Frustum;
 class LightSource;
 class ChunkMesh2;
 
@@ -18,6 +19,7 @@ namespace rendering {
 		FPSCamera& camera;
 		float deltaTime;
 		float lastTime;
+		Frustum* frustum;
 		LightSource* lightSource;
 		Array3D<ChunkMesh2*, WORLDSIZE, WORLDSIZE, WORLDSIZE>* world;
 	};
@@ -27,6 +29,7 @@ namespace rendering {
 	class RenderObject {
 	public:
 		virtual void render(const RenderingContext& ctx) = 0;
+		virtual bool inFrustum(const RenderingContext& ctx) = 0;
 	};
 
 	/*

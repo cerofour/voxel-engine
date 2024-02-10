@@ -141,7 +141,17 @@ Renderer& Renderer::attatchObject(RenderObject* obj) {
 }
 
 void Renderer::render(const RenderingContext& ctx) {
+
+	int totalObjects = this->objects.size();
+
+	int renderedObjects = 0;
+
 	for (auto& object : this->objects) {
-		object->render(ctx);
+		if (object->inFrustum(ctx)) {
+			renderedObjects++;
+			object->render(ctx);
+		}
 	}
+
+	std::cout << "Total objects: " << totalObjects << " Only rendered: " << renderedObjects << '\n';
 }
